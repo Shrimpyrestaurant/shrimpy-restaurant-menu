@@ -857,8 +857,7 @@
         });
 
         // ================= المساعد الذكي (الحل الجذري) =================
-        const apiKey = "AQ.Ab8RN6IjZ3YO7fDWC4nuQYatcKhVSHrnRflJ61lcN1jaPKLGFw";
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+        const CLOUDFLARE_WORKER_URL = "https://falling-pine-7d71.mustafazuhair888.workers.dev";
 
         function openAIModal() {
             showModal('aiModal');
@@ -902,13 +901,13 @@
                     contents: [{ parts: [{ text: userText }] }]
                 };
 
-                const response = await fetch(geminiUrl, {
+                const response = await fetch(CLOUDFLARE_WORKER_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) throw new Error("API Blocked");
+                if (!response.ok) throw new Error("API Request Failed");
                 const data = await response.json();
                 const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "عذراً، فيه مشكلة.";
                 
@@ -921,7 +920,7 @@
                         <div class="ai-msg">${formattedText}</div>
                     </div>`;
             } catch (err) {
-                // نظام الطوارئ: الرد المبرمج محلياً في حالة فشل أو حظر الـ API
+                // نظام الطوارئ: الرد المبرمج محلياً في حالة فشل الاتصال بالـ Worker
                 document.getElementById(loadingId).remove();
                 let fallbackMsg = "المنيو بتاعنا مليان حاجات حلوة! لو بتحب الساندوتشات جرب ساندوتش الجمبري بـ 35 جنيه، ولو عايز وجبة متكاملة، وجبة الجمبري البانيه بـ 155 جنيه ممتازة. تحب تطلب إيه؟ ✨🦐";
                 
