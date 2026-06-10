@@ -70,8 +70,10 @@
         @keyframes floatBlob { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(60px, 80px) scale(1.15); } 100% { transform: translate(-40px, 30px) scale(0.9); } }
 
         /* ================= شاشة البداية ================= */
-        .splash-screen { position: fixed; inset: 0; background: var(--primary); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; transition: opacity 0.6s ease, visibility 0.6s; }
-        .splash-logo { font-family: 'Bebas Neue', sans-serif; font-size: 5rem; letter-spacing: 4px; text-shadow: 0 4px 10px rgba(0,0,0,0.2); animation: pulseLogo 1.2s infinite alternate cubic-bezier(0.4, 0, 0.2, 1); }
+        .splash-screen { position: fixed; inset: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--text-dark); transition: opacity 0.6s ease, visibility 0.6s; }
+        body.dark-mode .splash-screen { background: rgba(0, 0, 0, 0.95); color: white; }
+        .splash-logo-img { width: 140px; height: 140px; border-radius: 50%; box-shadow: 0 10px 30px rgba(255, 90, 0, 0.3); margin-bottom: 25px; animation: pulseLogo 1.2s infinite alternate cubic-bezier(0.4, 0, 0.2, 1); object-fit: cover; border: 4px solid var(--bg-card); }
+        .splash-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 4rem; letter-spacing: 4px; text-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         @keyframes pulseLogo { 0% { transform: scale(0.95); opacity: 0.9; } 100% { transform: scale(1.05); opacity: 1; } }
         .splash-screen.hidden { opacity: 0; visibility: hidden; }
 
@@ -92,7 +94,6 @@
         .restaurant-header { margin: -70px 20px 20px; padding: 25px 20px; border-radius: var(--radius-lg); box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative; z-index: 5; text-align: center; background: var(--glass-header); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.2); transition: var(--transition); }
         body.dark-mode .restaurant-header { border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
         
-        /* تنسيق اللوجو في الهيدر */
         .header-logo-container { margin-top: -65px; margin-bottom: 10px; display: flex; justify-content: center; }
         .header-logo-img { width: 90px; height: 90px; border-radius: 50%; border: 4px solid var(--bg-card); box-shadow: var(--shadow-md); object-fit: cover; background: white; transition: var(--transition);}
         
@@ -226,7 +227,7 @@
         .cart-badge { background: var(--primary); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 900; }
         .flying-item { position: fixed; z-index: 9999; width: 24px; height: 24px; background: var(--primary); border-radius: 50%; transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: none; opacity: 0.9;}
 
-        /* ================= المساعد الذكي (AI Premium) ================= */
+        /* ================= المساعد الذكي (AI Premium - Glassy Design) ================= */
         .ai-fab { position: fixed; bottom: 95px; right: 20px; background: var(--ai-gradient); color: white; width: 58px; height: 58px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.6rem; box-shadow: 0 4px 20px rgba(255, 0, 122, 0.4), 0 0 0 4px rgba(255, 90, 0, 0.15); z-index: 800; cursor: pointer; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid white; animation: aiFloat 3s ease-in-out infinite; }
         @keyframes aiFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
         .ai-fab:active { transform: scale(0.9); }
@@ -234,15 +235,24 @@
         
         .ai-premium-title { background: var(--ai-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; display:flex; align-items:center; gap:8px; }
         
-        .ai-chat-container { height: 380px; display: flex; flex-direction: column; overflow-y: auto; padding: 10px 5px; scrollbar-width: thin; }
+        .ai-chat-container { 
+            height: 380px; display: flex; flex-direction: column; overflow-y: auto; padding: 15px; scrollbar-width: thin;
+            background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--radius-lg); border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+        }
+        body.dark-mode .ai-chat-container {
+            background: rgba(20, 20, 20, 0.5); border-color: rgba(255,255,255,0.05);
+        }
         
         /* Chat Bubbles UI */
         .ai-msg-wrapper { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px; animation: toastIn 0.3s ease-out; }
-        .ai-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--ai-gradient); display: flex; justify-content: center; align-items: center; color: white; font-size: 1rem; flex-shrink: 0; box-shadow: var(--shadow-sm); }
-        .ai-msg { background: var(--bg-body); color: var(--text-dark); border: 1px solid var(--border); box-shadow: var(--shadow-sm); border-bottom-right-radius: 4px; border-top-right-radius: var(--radius-md); border-top-left-radius: var(--radius-md); border-bottom-left-radius: var(--radius-md); padding: 12px 16px; max-width: 82%; font-size: 0.95rem; font-weight: 700; line-height: 1.5; }
+        .ai-avatar-img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; box-shadow: var(--shadow-sm); border: 2px solid var(--primary); flex-shrink: 0; background: white;}
+        .ai-msg { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: var(--text-dark); border: 1px solid rgba(255,255,255,0.9); box-shadow: var(--shadow-sm); border-bottom-right-radius: 4px; border-top-right-radius: var(--radius-md); border-top-left-radius: var(--radius-md); border-bottom-left-radius: var(--radius-md); padding: 12px 16px; max-width: 82%; font-size: 0.95rem; font-weight: 700; line-height: 1.5; }
+        body.dark-mode .ai-msg { background: rgba(30, 30, 30, 0.85); border-color: #333; }
         
         .user-msg-wrapper { display: flex; justify-content: flex-end; margin-bottom: 15px; animation: toastIn 0.3s ease-out; }
-        .user-msg { background: var(--ai-gradient); color: white; border-bottom-left-radius: 4px; border-top-right-radius: var(--radius-md); border-top-left-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md); padding: 12px 16px; max-width: 82%; font-size: 0.95rem; font-weight: 700; line-height: 1.5; box-shadow: 0 4px 10px rgba(255, 90, 0, 0.2); }
+        .user-msg { background: linear-gradient(135deg, rgba(255, 90, 0, 0.95), rgba(255, 0, 122, 0.95)); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: white; border-bottom-left-radius: 4px; border-top-right-radius: var(--radius-md); border-top-left-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md); padding: 12px 16px; max-width: 82%; font-size: 0.95rem; font-weight: 700; line-height: 1.5; box-shadow: 0 4px 10px rgba(255, 90, 0, 0.2); border: 1px solid rgba(255,255,255,0.2);}
 
         /* Quick Prompts (Chips) */
         .quick-prompts { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0 15px; scrollbar-width: none; }
@@ -250,7 +260,7 @@
         .prompt-chip { background: var(--primary-light); color: var(--primary); border: 1px solid rgba(255, 90, 0, 0.15); padding: 8px 16px; border-radius: 30px; font-size: 0.85rem; font-weight: 800; white-space: nowrap; cursor: pointer; transition: var(--transition); }
         .prompt-chip:active { transform: scale(0.95); }
 
-        .ai-input-box { display: flex; gap: 10px; margin-top: 5px; padding-top: 15px; border-top: 1px solid var(--border); }
+        .ai-input-box { display: flex; gap: 10px; margin-top: 15px; }
         .ai-input-box input { flex-grow: 1; padding: 14px 18px; border-radius: 30px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-dark); font-family: inherit; font-size: 0.95rem; font-weight: 700; outline: none; transition: var(--transition); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);}
         .ai-input-box input:focus { border-color: #FF007A; box-shadow: 0 0 0 3px rgba(255, 0, 122, 0.1); }
         .ai-input-box button { background: var(--ai-gradient); color: white; border: none; width: 48px; height: 48px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; cursor: pointer; transition: var(--transition); box-shadow: 0 4px 10px rgba(255, 0, 122, 0.3);}
@@ -280,40 +290,9 @@
         <div class="bg-blob blob-2"></div>
     </div>
 
-    <script>
-        function generateAppIcon() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 512; canvas.height = 512;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#FF5A00'; 
-            ctx.beginPath(); ctx.roundRect(0, 0, 512, 512, 100); ctx.fill();
-            ctx.fillStyle = '#FFFFFF'; ctx.font = 'bold 110px "Bebas Neue", sans-serif';
-            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('SHRIMPY', 256, 275);
-            return canvas.toDataURL('image/png');
-        }
-
-        const appIconBase64 = generateAppIcon();
-        document.getElementById('appleTouchIcon').href = appIconBase64;
-
-        const manifestData = {
-            "name": "Shrimpy App", "short_name": "Shrimpy", "description": "مطعم شرمبي للمأكولات البحرية السريعة",
-            "start_url": "./", "display": "standalone", "background_color": "#000000", "theme_color": "#FF5A00",
-            "icons": [{ "src": appIconBase64, "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }]
-        };
-        const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
-        document.getElementById('manifestLink').href = URL.createObjectURL(manifestBlob);
-
-        const swCode = `
-            self.addEventListener('install', (e) => { self.skipWaiting(); });
-            self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); });
-            self.addEventListener('fetch', (e) => { e.respondWith(caches.match(e.request).then(res => res || fetch(e.request))); });
-        `;
-        const swBlob = new Blob([swCode], {type: 'text/javascript'});
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.log('SW Reg Failed', err));
-    </script>
-
     <div class="splash-screen" id="splashScreen">
-        <div class="splash-logo">SHRIMPY</div>
+        <img src="https://raw.githubusercontent.com/Shrimpyrestaurant/shrimpy-restaurant-menu/refs/heads/main/FB_IMG_1780348844982.jpg" alt="Shrimpy Logo" class="splash-logo-img">
+        <div class="splash-logo-text">SHRIMPY</div>
     </div>
 
     <div class="install-prompt" id="installPrompt">
@@ -479,7 +458,7 @@
         <div class="drag-handle" onclick="closeAllModals()"></div>
         <div class="sheet-content">
             <h2 class="modal-title ai-premium-title">
-                <i class="fa-solid fa-robot"></i> شرمبي الذكي ✨
+                <i class="fa-solid fa-robot"></i> SHRIMPY ASSISTANT ✨
             </h2>
             <p style="color:var(--text-gray); font-size:0.9rem; font-weight:700; margin-bottom:15px;">اسألني عن المنيو، أو اطلب مني أرشحلك وجبة على قد ميزانيتك!</p>
             
@@ -492,8 +471,8 @@
 
             <div class="ai-chat-container" id="aiChatBox">
                 <div class="ai-msg-wrapper">
-                    <div class="ai-avatar"><i class="fa-solid fa-robot"></i></div>
-                    <div class="ai-msg">أهلاً بيك يا فندم! 🦐 أنا مساعدك الذكي من شرمبي. تحب أرشحلك تاكل إيه النهاردة؟</div>
+                    <img src="https://raw.githubusercontent.com/Shrimpyrestaurant/shrimpy-restaurant-menu/refs/heads/main/FB_IMG_1780348844982.jpg" alt="Assistant Logo" class="ai-avatar-img">
+                    <div class="ai-msg">أهلاً بيك يا فندم! 🦐 أنا المساعد الذكي من شرمبي. تحب أرشحلك تاكل إيه النهاردة؟</div>
                 </div>
             </div>
             
@@ -507,7 +486,27 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
-        // تحديث البيانات: دمج الإضافات داخل الأطباق الجانبية وحذف القديم
+        // Setup PWA Logo directly
+        const appIconUrl = "https://raw.githubusercontent.com/Shrimpyrestaurant/shrimpy-restaurant-menu/refs/heads/main/FB_IMG_1780348844982.jpg";
+        document.getElementById('appleTouchIcon').href = appIconUrl;
+
+        const manifestData = {
+            "name": "Shrimpy App", "short_name": "Shrimpy", "description": "مطعم شرمبي للمأكولات البحرية السريعة",
+            "start_url": "./", "display": "standalone", "background_color": "#000000", "theme_color": "#FF5A00",
+            "icons": [{ "src": appIconUrl, "sizes": "512x512", "type": "image/jpeg", "purpose": "any maskable" }]
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+        document.getElementById('manifestLink').href = URL.createObjectURL(manifestBlob);
+
+        const swCode = `
+            self.addEventListener('install', (e) => { self.skipWaiting(); });
+            self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); });
+            self.addEventListener('fetch', (e) => { e.respondWith(caches.match(e.request).then(res => res || fetch(e.request))); });
+        `;
+        const swBlob = new Blob([swCode], {type: 'text/javascript'});
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.log('SW Reg Failed', err));
+
+        // Data arrays remain the same
         const menuData = [
             { id: "cat_sandwiches", title: "الساندوتشات", icon: "fa-burger", items: [
                 { id: "s1", name: "ساندوتش جمبري", price: 35, isBestseller: true, image: "https://raw.githubusercontent.com/Shrimpyrestaurant/shrimpy-restaurant-menu/refs/heads/main/FB_IMG_1780894298521.jpg" }, 
@@ -552,7 +551,6 @@
             ]}
         ];
 
-        // مناطق المحلة الكبرى
         const mahallaAreas = [
             "أبو راضي", "محب", "سكة طنطا", "شكري القوتلي", "الجمهورية", "المنشية الجديدة", "المنشية القديمة", 
             "الشعبية", "المشحمة", "نعمان الأعصر", "أبو شاهين", "مدينة العمال", "السبع بنات", "سوق اللبن", 
@@ -856,8 +854,12 @@
             });
         });
 
-        // ================= المساعد الذكي (تم الربط مع Vercel بنجاح) =================
+        // ================= المساعد الذكي المُحدث =================
         const BACKEND_URL = "https://shrimpy-backend.vercel.app/chat";
+        const BOT_AVATAR = "https://raw.githubusercontent.com/Shrimpyrestaurant/shrimpy-restaurant-menu/refs/heads/main/FB_IMG_1780348844982.jpg";
+        
+        // مصفوفة الـ History لحل مشكلة النسيان
+        let aiChatHistory = [];
 
         function openAIModal() {
             showModal('aiModal');
@@ -876,7 +878,8 @@
 
             const chatBox = document.getElementById('aiChatBox');
             
-            // 1. عرض رسالة العميل
+            // 1. إضافة رسالة المستخدم للـ History وعرضها
+            aiChatHistory.push({ role: "user", content: userText });
             chatBox.innerHTML += `
                 <div class="user-msg-wrapper">
                     <div class="user-msg">${userText}</div>
@@ -884,11 +887,11 @@
             inputEl.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            // 2. عرض علامة التحميل (المساعد بيفكر)
+            // 2. عرض علامة التحميل بصورة اللوجو
             const loadingId = 'loading-' + Date.now();
             chatBox.innerHTML += `
                 <div class="ai-msg-wrapper" id="${loadingId}">
-                    <div class="ai-avatar"><i class="fa-solid fa-robot"></i></div>
+                    <img src="${BOT_AVATAR}" class="ai-avatar-img">
                     <div class="ai-msg">
                         <div class="typing-indicator"><span></span><span></span><span></span></div>
                     </div>
@@ -896,36 +899,36 @@
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
-                // 3. إرسال الطلب للسيرفر بتاعك على Vercel
+                // 3. إرسال الطلب للسيرفر بتاعك مع الـ History
                 const response = await fetch(BACKEND_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: userText }) // بيبعت السؤال بس لأن الشخصية متبرمجة في السيرفر
+                    body: JSON.stringify({ message: userText, history: aiChatHistory }) // الباك إند لازم يقرأ الـ history دلوقتي
                 });
 
                 const data = await response.json();
-                document.getElementById(loadingId).remove(); // شيل علامة التحميل
+                document.getElementById(loadingId).remove();
 
                 if (!response.ok) {
                     throw new Error(data.detail || "مشكلة في السيرفر");
                 }
 
-                // 4. تظبط شكل النص اللي راجع من الذكاء الاصطناعي
+                // 4. حفظ رد البوت في الـ History وتنسيقه للعرض
+                aiChatHistory.push({ role: "assistant", content: data.reply });
                 let formattedText = data.reply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
                 
                 chatBox.innerHTML += `
                     <div class="ai-msg-wrapper">
-                        <div class="ai-avatar"><i class="fa-solid fa-robot"></i></div>
+                        <img src="${BOT_AVATAR}" class="ai-avatar-img">
                         <div class="ai-msg">${formattedText}</div>
                     </div>`;
             } catch (err) {
                 const loader = document.getElementById(loadingId);
                 if (loader) loader.remove();
                 
-                // رسالة في حالة إن السيرفر مشغول أو فيه مشكلة
                 chatBox.innerHTML += `
                     <div class="ai-msg-wrapper">
-                        <div class="ai-avatar"><i class="fa-solid fa-robot"></i></div>
+                        <img src="${BOT_AVATAR}" class="ai-avatar-img">
                         <div class="ai-msg">معلش يا فندم، المطبخ زحمة شوية دلوقتي 😅 جرب تسألني تاني كمان ثواني!<br><br><small style="color:#EF4444; font-size:0.75rem;">(ملاحظة تقنية: ${err.message})</small></div>
                     </div>`;
             }
