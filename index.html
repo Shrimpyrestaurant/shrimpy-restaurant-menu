@@ -16,6 +16,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Tajawal:wght@400;500;700;800;900&family=Cormorant+Garamond:wght@600;700&family=El+Messiri:wght@400;600;700&family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- إضافة واجهة برمجة يوتيوب للتحكم في الموسيقى -->
+    <script src="https://www.youtube.com/iframe_api"></script>
     <style>
         :root {
             --bg: #030303;
@@ -274,10 +276,11 @@
         .install-bar.show {
             top: 18px;
         }
+        /* تعديل لجعل الأيقونة دائرية بالكامل */
         .install-ico {
             width: 44px;
             height: 44px;
-            border-radius: 12px;
+            border-radius: 50%;
             overflow: hidden;
             border: 1px solid rgba(201, 169, 110, 0.3);
             flex-shrink: 0;
@@ -1266,6 +1269,43 @@
             color: var(--coral);
         }
 
+        /* ── فاصل متحرك بين المنيو والفوتر ── */
+        .dynamic-separator {
+            text-align: center;
+            margin: 28px 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+        .dynamic-separator .sep-line {
+            width: 120px;
+            height: 3px;
+            background: var(--gold);
+            margin: 0 auto;
+            border-radius: 3px;
+            animation: separatorPulse 2.5s ease-in-out infinite;
+        }
+        @keyframes separatorPulse {
+            0%,
+            100% {
+                transform: scaleX(1);
+                opacity: 0.7;
+                background: var(--gold);
+                box-shadow: 0 0 6px var(--gold);
+            }
+            30% {
+                transform: scaleX(1.4);
+                opacity: 1;
+                background: var(--coral);
+                box-shadow: 0 0 14px var(--coral-glow);
+            }
+            60% {
+                transform: scaleX(0.8);
+                opacity: 0.9;
+                background: var(--gold-light);
+                box-shadow: 0 0 10px var(--gold-light);
+            }
+        }
+
         /* ── FLOATING CART ── */
         .fcart {
             position: fixed;
@@ -2183,7 +2223,7 @@
                 <button class="hero-icon-btn" id="langBtn" onclick="toggleLang()" title="Language"><i class="fa-solid fa-globe"></i></button>
             </div>
             <div class="ht-group">
-                <button class="hero-icon-btn music-active" id="musicBtn" onclick="toggleMusic()" title="Jazz Music"><i class="fa-solid fa-music"></i></button>
+                <button class="hero-icon-btn music-active" id="musicBtn" onclick="toggleMusic()" title="Piano Music"><i class="fa-solid fa-music"></i></button>
             </div>
         </div>
         <div class="hero-content">
@@ -2201,7 +2241,7 @@
     <div class="search-wrap">
         <div class="search-glass">
             <button class="mic-btn-inner" id="micBtn" onclick="voiceSearch()"><i class="fa-solid fa-microphone"></i></button>
-            <input type="text" id="searchInput" data-lang-placeholder="search_placeholder" placeholder="ابحث عن وجبة أو صنف..." oninput="filterMenu()">
+            <input type="text" id="searchInput" data-lang-placeholder="search_placeholder" placeholder="ابحث عن وجبة أو صنف..." oninput="filterMenu()" onfocus="stopPlaceholderAnimation()" onblur="startPlaceholderAnimationIfEmpty()">
             <i class="fa-solid fa-search si"></i>
         </div>
     </div>
@@ -2236,15 +2276,20 @@
             <p><i class="fa-solid fa-location-dot"></i> <span data-lang="footer_addr">المحلة الكبرى - ابو راضي - بجوار ألبان الكابتن - أمام ماركت المكاكي</span></p>
             <p><i class="fa-solid fa-phone"></i> 01101012543</p>
         </div>
-        <div class="frights">
-            <span>&copy; 2026 Shrimpy</span>
-            <div class="sep"></div>
-            <span>Dev by Mustafa Zuhair</span>
-        </div>
+        <!-- أيقونات السوشيال ميديا تحت العنوان ورقم التليفون -->
         <div class="socials">
             <a href="https://www.facebook.com/" target="_blank" rel="noopener"><i class="fa-brands fa-facebook-f"></i></a>
             <a href="https://www.instagram.com/" target="_blank" rel="noopener"><i class="fa-brands fa-instagram"></i></a>
             <a href="https://wa.me/201101012543" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i></a>
+        </div>
+        <!-- الشريط المتحرك بين السوشيال والحقوق -->
+        <div class="dynamic-separator">
+            <div class="sep-line"></div>
+        </div>
+        <div class="frights">
+            <span>&copy; 2026 Shrimpy</span>
+            <div class="sep"></div>
+            <span>Dev by Mustafa Zuhair</span>
         </div>
     </footer>
 
@@ -2369,146 +2414,202 @@
     <!-- ══════════════ TOASTS ══════════════ -->
     <div class="toast-wrap" id="toasts"></div>
 
+    <!-- ══════════════ مشغل موسيقى البيانو من يوتيوب (مخفي) ══════════════ -->
+    <div id="youtubePlayerContainer" style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;"></div>
+
     <script>
-        /* ═══════════════════════ JAZZ AMBIENT MUSIC ENGINE ═══════════════════════ */
-        class JazzAmbient {
-            constructor() {
-                this.ctx = null;
-                this.playing = false;
-                this.nodes = [];
-                this.gainNode = null;
-                this._initOnInteraction = () => {
-                    if (!this.ctx && this.playing) this._start();
-                };
-                document.addEventListener('click', this._initOnInteraction, { once: true });
-                document.addEventListener('touchstart', this._initOnInteraction, { once: true });
-            }
+        /* ═══════════════════════ YOUTUBE PIANO MUSIC PLAYER ═══════════════════════ */
+        let youtubePlayer = null;
+        let musicEnabled = true;
+        let playerReady = false;
 
-            _start() {
-                try {
-                    this.ctx = new(window.AudioContext || window.webkitAudioContext)();
-                    this.gainNode = this.ctx.createGain();
-                    this.gainNode.gain.value = 0.06;
-                    this.gainNode.connect(this.ctx.destination);
-                    this._playLoop();
-                    this.playing = true;
-                } catch (e) { this.playing = false; }
-            }
-
-            _playLoop() {
-                if (!this.ctx || !this.playing) return;
-                const now = this.ctx.currentTime;
-                // Soft jazz chord progression: Dm9 → G13 → Cmaj9 → Am11 (ii-V-I-vi in C)
-                const chords = [
-                    { notes: [293.66, 349.23, 440, 523.25, 587.33], dur: 4 }, // Dm9
-                    { notes: [392, 466.16, 587.33, 698.46, 783.99], dur: 4 }, // G13
-                    { notes: [261.63, 329.63, 392, 466.16, 523.25], dur: 4 }, // Cmaj9
-                    { notes: [220, 261.63, 329.63, 392, 440], dur: 4 }, // Am11
-                ];
-                let time = now;
-                const totalLoop = chords.reduce((s, c) => s + c.dur, 0);
-
-                const scheduleChords = (startTime) => {
-                    let t = startTime;
-                    chords.forEach(chord => {
-                        chord.notes.forEach(freq => {
-                            const osc = this.ctx.createOscillator();
-                            const g = this.ctx.createGain();
-                            osc.type = 'sine';
-                            osc.frequency.value = freq;
-                            g.gain.setValueAtTime(0, t);
-                            g.gain.linearRampToValueAtTime(0.025, t + 0.3);
-                            g.gain.setValueAtTime(0.025, t + chord.dur - 0.4);
-                            g.gain.linearRampToValueAtTime(0, t + chord.dur);
-                            osc.connect(g);
-                            g.connect(this.gainNode);
-                            osc.start(t);
-                            osc.stop(t + chord.dur);
-                            this.nodes.push(osc, g);
-                        });
-                        // Soft bass note
-                        const bassFreq = chord.notes[0] / 2;
-                        const bass = this.ctx.createOscillator();
-                        const bassG = this.ctx.createGain();
-                        bass.type = 'triangle';
-                        bass.frequency.value = bassFreq;
-                        bassG.gain.setValueAtTime(0, t);
-                        bassG.gain.linearRampToValueAtTime(0.04, t + 0.2);
-                        bassG.gain.setValueAtTime(0.04, t + chord.dur - 0.3);
-                        bassG.gain.linearRampToValueAtTime(0, t + chord.dur);
-                        bass.connect(bassG);
-                        bassG.connect(this.gainNode);
-                        bass.start(t);
-                        bass.stop(t + chord.dur);
-                        this.nodes.push(bass, bassG);
-                        t += chord.dur;
-                    });
-                    // Schedule next loop
-                    this._loopTimeout = setTimeout(() => {
-                        this._cleanNodes();
-                        if (this.playing) scheduleChords(this.ctx.currentTime);
-                    }, (totalLoop - 0.1) * 1000);
-                };
-                scheduleChords(time);
-            }
-
-            _cleanNodes() {
-                this.nodes = this.nodes.filter(n => {
-                    try { return n.context && n.context.state !== 'closed'; } catch (e) { return false; }
-                });
-                if (this.nodes.length > 40) this.nodes.splice(0, this.nodes.length - 40);
-            }
-
-            play() {
-                this.playing = true;
-                if (this.ctx) {
-                    this._cleanNodes();
-                    this.gainNode.gain.value = 0.06;
-                    this._playLoop();
-                } else {
-                    // Will start on first interaction via _initOnInteraction
+        // تحميل الـ API تلقائياً واستدعاء الدالة عند الجاهزية
+        function onYouTubeIframeAPIReady() {
+            console.log('YouTube IFrame API ready');
+            // إنشاء المشغل مخفي
+            youtubePlayer = new YT.Player('youtubePlayerContainer', {
+                videoId: 'mD0ZSO7LfCA', // فيديو البيانو المطلوب
+                playerVars: {
+                    autoplay: 0,
+                    controls: 0,
+                    disablekb: 1,
+                    fs: 0,
+                    iv_load_policy: 3,
+                    loop: 1,
+                    modestbranding: 1,
+                    playsinline: 1,
+                    rel: 0,
+                    showinfo: 0,
+                },
+                events: {
+                    onReady: onPlayerReady,
+                    onStateChange: onPlayerStateChange,
+                    onError: onPlayerError
                 }
-            }
-
-            stop() {
-                this.playing = false;
-                if (this.gainNode) this.gainNode.gain.value = 0;
-                if (this._loopTimeout) clearTimeout(this._loopTimeout);
-                this.nodes.forEach(n => { try { n.stop(); } catch (e) {} });
-                this.nodes = [];
-            }
-
-            toggle() {
-                if (this.playing) { this.stop(); return false; } else { this.play(); return true; }
-            }
-
-            get isPlaying() { return this.playing; }
+            });
         }
 
-        const jazzAmbient = new JazzAmbient();
-        let musicEnabled = true;
+        function onPlayerReady(event) {
+            playerReady = true;
+            console.log('YouTube player ready');
+            // ضبط الصوت بنسبة 50% (أعلى من السابق)
+            youtubePlayer.setVolume(50);
+            // إذا كانت الموسيقى مفعلة ابدأ التشغيل
+            if (musicEnabled) {
+                // التشغيل يحتاج إلى تفاعل مستخدم، سيتم في toggleMusic عند الضغط
+            }
+        }
 
+        function onPlayerStateChange(event) {
+            // عند انتهاء الفيديو، أعد تشغيله (لحلقة مستمرة)
+            if (event.data === YT.PlayerState.ENDED) {
+                youtubePlayer.playVideo();
+            }
+        }
+
+        function onPlayerError(event) {
+            console.error('YouTube player error:', event.data);
+            // في حالة الخطأ نعود إلى الوضع الصامت
+            playerReady = false;
+        }
+
+        // تفعيل/تعطيل الموسيقى من زر الهيرو
         function toggleMusic() {
             const btn = document.getElementById('musicBtn');
-            const wasPlaying = jazzAmbient.isPlaying;
-            const nowPlaying = jazzAmbient.toggle();
-            musicEnabled = nowPlaying;
-            if (nowPlaying) {
-                btn.classList.add('music-active');
-                btn.classList.remove('music-muted');
-                btn.innerHTML = '<i class="fa-solid fa-music"></i>';
-                btn.title = 'Jazz Music: On';
-            } else {
+            if (!youtubePlayer || !playerReady) {
+                // اليوتيوب غير جاهز، نحاول التحميل عند الضغط
+                if (!youtubePlayer) {
+                    // قد يكون الـ API لم يحمل بعد، نضبط العلم وننتظر
+                    console.log('YouTube player not ready yet, trying again...');
+                }
+                hapticLight();
+                return;
+            }
+
+            if (musicEnabled) {
+                // إيقاف الموسيقى
+                youtubePlayer.pauseVideo();
+                musicEnabled = false;
                 btn.classList.remove('music-active');
                 btn.classList.add('music-muted');
                 btn.innerHTML = '<i class="fa-solid fa-music"></i>';
-                btn.title = 'Jazz Music: Off';
+                btn.title = 'Piano Music: Off';
+            } else {
+                // تشغيل الموسيقى
+                youtubePlayer.playVideo();
+                musicEnabled = true;
+                btn.classList.add('music-active');
+                btn.classList.remove('music-muted');
+                btn.innerHTML = '<i class="fa-solid fa-music"></i>';
+                btn.title = 'Piano Music: On';
             }
-            localStorage.setItem('shrimpy_music', nowPlaying ? '1' : '0');
+            localStorage.setItem('shrimpy_music', musicEnabled ? '1' : '0');
             hapticLight();
         }
 
-        /* ═══════════════════════ VIBRATION / HAPTIC SYSTEM (iPhone-style) ═══════════════════════ */
+        // محاولة بدء الموسيقى عند أول تفاعل (حل بديل)
+        function tryStartMusicOnInteraction() {
+            if (musicEnabled && youtubePlayer && playerReady) {
+                youtubePlayer.playVideo();
+            }
+            document.removeEventListener('click', tryStartMusicOnInteraction);
+            document.removeEventListener('touchstart', tryStartMusicOnInteraction);
+        }
+        document.addEventListener('click', tryStartMusicOnInteraction, { once: true });
+        document.addEventListener('touchstart', tryStartMusicOnInteraction, { once: true });
+
+        /* ═══════════════════════ PLACEHOLDER ANIMATION (RAF) ═══════════════════════ */
+        const searchInput = document.getElementById('searchInput');
+        const placeholderAnim = {
+            text: '',
+            index: 0,
+            forward: true,
+            frameId: null,
+            lastTime: 0,
+            interval: 120,
+            paused: false
+        };
+
+        function updatePlaceholderText() {
+            placeholderAnim.text = t('search_placeholder');
+        }
+
+        function startPlaceholderAnimation() {
+            stopPlaceholderAnimation();
+            updatePlaceholderText();
+            if (!placeholderAnim.text) return;
+            placeholderAnim.index = 0;
+            placeholderAnim.forward = true;
+            placeholderAnim.lastTime = 0;
+            placeholderAnim.paused = false;
+            searchInput.placeholder = '';
+            placeholderAnim.frameId = requestAnimationFrame(animatePlaceholderRAF);
+        }
+
+        function animatePlaceholderRAF(timestamp) {
+            if (placeholderAnim.paused || !placeholderAnim.text) {
+                placeholderAnim.frameId = requestAnimationFrame(animatePlaceholderRAF);
+                return;
+            }
+            if (!placeholderAnim.lastTime) placeholderAnim.lastTime = timestamp;
+            const elapsed = timestamp - placeholderAnim.lastTime;
+            if (elapsed >= placeholderAnim.interval) {
+                const steps = Math.floor(elapsed / placeholderAnim.interval);
+                placeholderAnim.lastTime += steps * placeholderAnim.interval;
+                for (let i = 0; i < steps; i++) {
+                    if (placeholderAnim.forward) {
+                        if (placeholderAnim.index <= placeholderAnim.text.length) {
+                            searchInput.placeholder = placeholderAnim.text.substring(0, placeholderAnim.index);
+                            placeholderAnim.index++;
+                        } else {
+                            placeholderAnim.forward = false;
+                            placeholderAnim.index = placeholderAnim.text.length;
+                        }
+                    } else {
+                        if (placeholderAnim.index >= 0) {
+                            searchInput.placeholder = placeholderAnim.text.substring(0, placeholderAnim.index);
+                            placeholderAnim.index--;
+                        } else {
+                            placeholderAnim.forward = true;
+                            placeholderAnim.index = 0;
+                        }
+                    }
+                }
+            }
+            placeholderAnim.frameId = requestAnimationFrame(animatePlaceholderRAF);
+        }
+
+        function stopPlaceholderAnimation() {
+            if (placeholderAnim.frameId) {
+                cancelAnimationFrame(placeholderAnim.frameId);
+                placeholderAnim.frameId = null;
+            }
+            placeholderAnim.paused = true;
+        }
+
+        function startPlaceholderAnimationIfEmpty() {
+            if (searchInput.value.trim() === '') {
+                startPlaceholderAnimation();
+            }
+        }
+
+        // بدء الأنيميشن بعد تحميل الصفحة
+        window.addEventListener('load', () => {
+            updatePlaceholderText();
+            startPlaceholderAnimation();
+        });
+
+        // إعادة تشغيل الأنيميشن عند تغيير اللغة
+        const originalToggleLang = toggleLang;
+        toggleLang = function() {
+            originalToggleLang();
+            updatePlaceholderText();
+            if (document.activeElement !== searchInput || searchInput.value.trim() === '') {
+                startPlaceholderAnimation();
+            }
+        };
+
+        /* ═══════════════════════ HAPTIC VIBRATION (تم التحقق من الدعم) ═══════════════════════ */
         function hapticLight() { if ('vibrate' in navigator) navigator.vibrate(8); }
 
         function hapticMedium() { if ('vibrate' in navigator) navigator.vibrate(12); }
@@ -2699,7 +2800,7 @@
                 empty_orders: 'لا توجد طلبات سابقة',
                 empty_orders_sub: 'أرسل طلبك الأول الآن',
                 reorder_btn: 'أعد الطلب',
-                min_order: 'الحد الأدنى للطلب 100 ج.م',
+                min_order: 'الحد الأدنى للطلب 100 ج.م', // احتفظنا بالنص للترجمة فقط
                 coupon_invalid: 'كوبون غير صحيح',
                 coupon_used: 'تم استخدام الكوبون من قبل',
                 coupon_ok: 'خصم',
@@ -2818,6 +2919,11 @@
             localStorage.setItem('shrimpy_lang', currentLang);
             hapticMedium();
             toast(currentLang === 'en' ? '🇬🇧 English' : '🇪🇬 العربية', 'ok');
+            // إعادة تشغيل الأنيميشن بلغة جديدة
+            updatePlaceholderText();
+            if (document.activeElement !== searchInput || searchInput.value.trim() === '') {
+                startPlaceholderAnimation();
+            }
         }
 
         function getItemName(item) { return currentLang === 'en' && item.nameEn ? item.nameEn : item.name; }
@@ -2845,7 +2951,7 @@
             container: null };
         let loyaltyPoints = 0;
         let ordersHistory = [];
-        let pendingMerge = null; // For cart merge flow
+        let pendingMerge = null;
 
         /* ═══════════════════════ PWA ═══════════════════════ */
         window.addEventListener('beforeinstallprompt', e => {
@@ -2911,14 +3017,15 @@
                 musicBtn.classList.remove('music-active');
                 musicBtn.classList.add('music-muted');
             } else {
-                // Auto-start jazz on first interaction
-                jazzAmbient.play();
+                musicEnabled = true;
             }
             animateSplashWord();
             renderSkels();
             renderAreas();
             loadSaved();
             updateAllTranslations();
+            updatePlaceholderText();
+            startPlaceholderAnimation();
             setTimeout(() => {
                 document.getElementById('splash').classList.add('out');
                 document.getElementById('skelWrap').style.display = 'none';
@@ -2930,8 +3037,6 @@
                 updateLoyaltyBar();
                 checkLoyaltyReward();
                 requestNotificationPermission();
-                // Try to start jazz after splash
-                if (musicEnabled && !jazzAmbient.isPlaying) jazzAmbient.play();
             }, 2200);
         });
 
@@ -3407,7 +3512,6 @@
             if (isActive) {
                 btn.classList.add('active');
                 btn.innerHTML = '<i class="fa-solid fa-heart"></i>';
-                // Trigger heartbeat animation
                 btn.classList.remove('active');
                 void btn.offsetWidth;
                 btn.classList.add('active');
@@ -3477,27 +3581,19 @@
 
         /* ═══════════════════════ SMART CART LOGIC ═══════════════════════ */
         function smartAddToCart(item, qty, notes) {
-            // Find all existing entries with same ID
             const existingSameId = cart.filter(c => c.id === item.id);
-
             if (existingSameId.length > 0) {
-                // Check if any have the exact same notes
                 const sameNotes = existingSameId.find(c => (c.notes || '') === (notes || ''));
                 if (sameNotes) {
-                    // Same item, same notes → increment quantity
                     sameNotes.qty += qty;
                     return 'merged';
                 } else if (notes && existingSameId.some(c => (c.notes || '') !== (notes || ''))) {
-                    // Different notes exist → we need to ask the user
-                    // Store pending merge info and show prompt
                     return 'prompt';
                 } else {
-                    // No notes on new item, increment first matching
                     existingSameId[0].qty += qty;
                     return 'merged';
                 }
             } else {
-                // Completely new item
                 cart.push({
                     uid: item.id + Date.now() + Math.random().toString(36).substr(2, 5),
                     id: item.id,
@@ -3529,7 +3625,6 @@
             document.body.appendChild(overlay);
 
             document.getElementById('mpMerge').onclick = () => {
-                // Increment the first existing item's quantity
                 existingItems[0].qty += qty;
                 if (notes && !existingItems[0].notes) existingItems[0].notes = notes;
                 saveCart();
@@ -3836,7 +3931,8 @@
 
         function openCheckout() {
             const sub = cart.reduce((s, i) => s + i.price * i.qty, 0);
-            if (sub < 100) return toast(t('min_order'), 'err');
+            // تم إلغاء الحد الأدنى
+            // if (sub < 100) return toast(t('min_order'), 'err');
             closeAll();
             document.querySelector('#checkSheet .modal-title').textContent = t('checkout_title');
             document.querySelector('#checkSheet label[for="typeD"] span').textContent = t('delivery');
